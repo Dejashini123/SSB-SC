@@ -52,8 +52,61 @@ Model Waveform
 <img width="706" height="167" alt="image" src="https://github.com/user-attachments/assets/bff0d8fd-d679-444e-af37-0b34585853c1" />
 
 Program
+```clc;
+clear;
+close;
+
+// Parameters (your sir’s formula, with table value = 14)
+Am = 14;       // Message amplitude
+Ac = 28;       // Carrier amplitude (Am*2)
+Fm = 10;       // Message frequency
+Fc = 100;      // Carrier frequency (Fm*10)
+Fs = 1000;     // Sampling frequency (Fc*10)
+t  = 0:1/Fs:2/Fm;  // Time base (two message cycles)
+
+// Message signal
+m = Am * cos(2*%pi*Fm*t);
+subplot(4,1,1);
+plot(t, m);
+xtitle("Message Signal");
+
+// Carrier signal
+c = Ac * cos(2*%pi*Fc*t);
+subplot(4,1,2);
+plot(t, c);
+xtitle("Carrier Signal");
+
+// ---- SSB-SC Modulation ----
+// Analytic signal using Hilbert transform
+mh = imag(hilbert(m));   // Hilbert transform of message
+
+// Upper Sideband (USB)
+ssb_usb = m .* cos(2*%pi*Fc*t) - mh .* sin(2*%pi*Fc*t);
+
+// Lower Sideband (LSB)
+//ssb_lsb = m .* cos(2*%pi*Fc*t) + mh .* sin(2*%pi*Fc*t);
+
+subplot(4,1,3);
+plot(t, ssb_usb);
+xtitle("SSB-SC (USB) Signal");
+
+// ---- Demodulation ----
+demod = ssb_usb .* c;   // Coherent detection
+
+// Simple Low-pass filter
+N = 50;
+h = ones(1,N)/N;
+rec = conv(demod, h, "same");
+
+subplot(4,1,4);
+plot(t, rec);
+xtitle("Demodulated Message Signal");
+xgrid();
+```
 
 OUTPUT WAVEFORM
+<img width="959" height="539" alt="image" src="https://github.com/user-attachments/assets/072304bc-fe21-4bf2-a88f-5a2d25023036" />
+
 
 TABULATION
 
