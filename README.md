@@ -52,60 +52,48 @@ Model Waveform
 <img width="706" height="167" alt="image" src="https://github.com/user-attachments/assets/bff0d8fd-d679-444e-af37-0b34585853c1" />
 
 Program
-```clc;
-clear;
-close;
-
-// Parameters (your sir’s formula, with table value = 14)
-Am = 14;       // Message amplitude
-Ac = 28;       // Carrier amplitude (Am*2)
-Fm = 10;       // Message frequency
-Fc = 100;      // Carrier frequency (Fm*10)
-Fs = 1000;     // Sampling frequency (Fc*10)
-t  = 0:1/Fs:2/Fm;  // Time base (two message cycles)
-
-// Message signal
-m = Am * cos(2*%pi*Fm*t);
+```
+ac=16.8; 
+Am=8.4; 
+fc=4100;
+fm=410;
+fs=25000; 
+t=0:1/fs:2/fm; 
+wc=2*3.14*fc;
+wm=2*3.14*fm;
+e1=(Am*sin(wm*t));
 subplot(4,1,1);
-plot(t, m);
-xtitle("Message Signal");
-
-// Carrier signal
-c = Ac * cos(2*%pi*Fc*t);
-subplot(4,1,2);
-plot(t, c);
-xtitle("Carrier Signal");
-
-// ---- SSB-SC Modulation ----
-// Analytic signal using Hilbert transform
-mh = imag(hilbert(m));   // Hilbert transform of message
-
-// Upper Sideband (USB)
-ssb_usb = m .* cos(2*%pi*Fc*t) - mh .* sin(2*%pi*Fc*t);
-
-// Lower Sideband (LSB)
-//ssb_lsb = m .* cos(2*%pi*Fc*t) + mh .* sin(2*%pi*Fc*t);
-
+plot(t,e1); 
+xlabel("Time(s)");
+ylabel("Amplitude");
+title("Message Signal m(t)");
+e2=(ac*sin(wc*t)); 
+subplot(4,1,2); 
+plot(t,e2);
+xlabel("Time(s)");
+ylabel("Amplitude");
+title("Carrier Signal c(t)");
+sbsc1=(Am/2.*cos(wc*t-wm*t))-(Am/2.*cos(wc*t+wm*t));
+sbsc2=(Am/2.*cos(wc*t-wm*t))+(Am/2.*cos(wc*t+wm*t)); 
+e3=(sbsc2)+(sbsc1); 
 subplot(4,1,3);
-plot(t, ssb_usb);
-xtitle("SSB-SC (USB) Signal");
+plot(t,e3);
+xlabel("Time(s)");
+ylabel("Amplitude");
+title("SSB-SC Modulated Signal (LSB)");
+e4=(sbsc2)-(sbsc1); 
+subplot(4,1,4); 
+plot(t,e4);
+xlabel("Time(s)");
+ylabel("Amplitude");
+title("SSB-SC Modulated Signal (USB)");
+xgrid;
 
-// ---- Demodulation ----
-demod = ssb_usb .* c;   // Coherent detection
-
-// Simple Low-pass filter
-N = 50;
-h = ones(1,N)/N;
-rec = conv(demod, h, "same");
-
-subplot(4,1,4);
-plot(t, rec);
-xtitle("Demodulated Message Signal");
-xgrid();
 ```
 
 OUTPUT WAVEFORM
-<img width="959" height="539" alt="image" src="https://github.com/user-attachments/assets/072304bc-fe21-4bf2-a88f-5a2d25023036" />
+<img width="1918" height="1132" alt="image" src="https://github.com/user-attachments/assets/9cb3aafe-727a-47da-aff5-ceb8d775f9f9" />
+
 
 
 TABULATION
